@@ -1,12 +1,12 @@
 // const socket = new WebSocket('wss://nostr.0x50.tech');
 const socket = new WebSocket('wss://relay.damus.io');
+const articles = [];
 
 socket.onopen = function(event) {
     socket.send('["REQ", "133742069", {"kinds": [30023], "limit": 10}]');
 };
 
 socket.onmessage = function(event) {
-    const articles = [];
     // const shortTextNotesContainer = document.getElementById('short-text-notes-container');
     const latestPostTitle = document.getElementById('latest-post-title');
     const latestPostReleaseDate = document.getElementById('latest-post-release-date');
@@ -54,6 +54,4 @@ socket.onmessage = function(event) {
             articles.push(article);
         }
     }
-
-    console.log(articles)
 };
