@@ -6,6 +6,7 @@ socket.onopen = function(event) {
 };
 
 socket.onmessage = function(event) {
+    const articles = [];
     // const shortTextNotesContainer = document.getElementById('short-text-notes-container');
     const latestPostTitle = document.getElementById('latest-post-title');
     const latestPostReleaseDate = document.getElementById('latest-post-release-date');
@@ -14,11 +15,13 @@ socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
     if (data[0] === "EVENT") {
         if(data[2].kind === 30023) {
+            const article = {};
             const content = data[2].content;
             for(tag in data[2].tags) {
                 if(data[2].tags[tag][0] === "title") {
                     const title = data[2].tags[tag][1];
                     latestPostTitle.innerHTML = title;
+                    article.title = title;
                 }
                 if(data[2].tags[tag][0] === "published_at") {
                     const releaseDate = data[2].tags[tag][1];
@@ -29,14 +32,14 @@ socket.onmessage = function(event) {
                 if(data[2].tags[tag][0] === "summary") {
                     const summary = data[2].tags[tag][1];
                     latestPostSummary.innerHTML = summary;
+                    article.summary = summary;
                 }
                 if(data[2].tags[tag][0] === "image") {
                     const image = data[2].tags[tag][1];
-                    // console.log(image)
                     const htmlImage = document.createElement('img');
                     htmlImage.src = image;
-                    console.log(htmlImage)
-                    latestPostImage.innerHTML(htmlImage);
+                    latestPostImage.appendChild(htmlImage);
+                    article.image = image;
                 }
             }
             const pubkey = data[2].pubkey;
@@ -44,31 +47,13 @@ socket.onmessage = function(event) {
             const createdAt = data[2].created_at;
             const date = new Date(createdAt * 1000);
             const formattedTime = date.toLocaleString();
-            // console.log(data[2]);
-            // console.log(content);
-            // console.log(title);
-            // featuredPostTitle.innerHTML = title;
 
-            // const para = document.createElement('p');
-            // // para.innerHTML = pubkeyShortened + ": " + content;
-            // para.innerHTML = `<span class="createdAt">(${formattedTime})</span> <span class="pubkey">${pubkeyShortened}:</span> ${content}`;
-            // // Start Copy & Paste Pubkey Functionality
-            // const pubkeySpan = para.querySelector('.pubkey');
-            // pubkeySpan.addEventListener('click', function() {
-            //     const tempInput = document.createElement('input');
-            //     tempInput.value = pubkey;
-            //     tempInput.setAttribute('readonly', '');
-            //     tempInput.style.position = 'absolute';
-            //     tempInput.style.left = '-9999px';
-            //     document.body.appendChild(tempInput);
-            //     tempInput.select();
-            //     document.execCommand('copy');
-            //     document.body.removeChild(tempInput);
-            // });
-            // // End Copy & Paste Pubkey Functionality
-            // longTextNotesContainer.insertBefore(para, longTextNotesContainer.firstChild);
+            article.pubkey = pubkey;
+            article.createdAt = createdAt;
+            article.content = content;
+            articles.push(article);
         }
-    } else {
-        // infoContainer.innerHTML = data[2].content;
     }
+
+    console.log(articles)
 };
